@@ -1,0 +1,14 @@
+
+*.suo
+*.dll
+*.pdb
+*.exe
+*.json
+ConsoleCord/.vs
+ConsoleCord/ConsoleCord/obj
+ConsoleCord/ConsoleCord/bin
+ConsoleCord/.vs/ConsoleCord/v16/.suo
+ConsoleCord/ConsoleCord/obj
+ConsoleCord/.vs/ConsoleCord/v16/.suo
+ConsoleCord/.vs/ConsoleCord/v16/.suo
+ConsoleCord/obj
