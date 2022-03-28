@@ -1,4 +1,4 @@
-﻿//#define DEBUG_ARGS
+﻿#define DEBUG_ARGS
 
 using System;
 using c = System.Console;
@@ -10,7 +10,11 @@ namespace ConsoleCord
     {
         public static void Main(string[] args)
         {
-            args[0] = args[0].Contains('/') ? args[0].Remove(args[0].Length - 1, 1).Remove(0, 7) : args[0].Contains('-') && !args[0].Contains(':') ? args[0] : args[0].Remove(0, 5);
+            args[0] = args[0].Contains('/') 
+                ? args[0].Remove(args[0].Length - 1, 1).Remove(0, 7) 
+                : args[0].Contains('-') && !args[0].Contains(':') 
+                    ? args[0] 
+                    : args[0].Remove(0, 5);
             string[] subArguments = args[0].Split("%20");
             // ok so basically
             // if ur running an argument, dont remove anything
@@ -35,13 +39,18 @@ namespace ConsoleCord
                     ProtocolManager.UninstallProtocol();
                     break;
                 case "server":
-                    var server = new ConsolecordServer(int.Parse(subArguments[1]), subArguments[2]);
+                    c.Title = "Server";
+                    ConsoleCordServer.CreateServer(int.Parse(subArguments[1]), subArguments[2]);
                     c.WriteLine("Press any key to stop the server.");
                     c.ReadLine();
                     break;
-                case "client":
-                    string clientName = subArguments.Length >= 3 ? subArguments[2] : Environment.MachineName;
-                    var client = new ConsoleCordClient(int.Parse(subArguments[1]), clientName);
+                case "client": // client name must be at least 4 characters
+                    c.Title = "Client";
+                    ConsoleCordClient.Createclient(subArguments[1], int.Parse(subArguments[2]), subArguments[3].Length >= 4 
+                        ? subArguments[3] 
+                        : Environment.MachineName.Length >= 4 
+                            ? Environment.MachineName 
+                            : $"Client_{Environment.MachineName}", subArguments[4]);
                     c.WriteLine("Press any key to stop debugging.");
                     break;
                 case "hello":

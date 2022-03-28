@@ -12,6 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="ACH-1 Demonstrator">
       <HintPath>..\..\ADISTLS\ADIS-TLS\ADIS-TLS\bin\Debug\net6.0\ACH-1 Demonstrator.dll</HintPath>
     </Reference>

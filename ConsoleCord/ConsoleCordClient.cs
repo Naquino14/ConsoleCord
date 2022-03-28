@@ -10,20 +10,26 @@ namespace ConsoleCord
 {
     public class ConsoleCordClient
     {
-        public string ClientName { get; private set; }
-        public int Port { get; private set; }
-        internal Socket ClientSocket { get; private set; }
-        public ConsoleCordClient(int port, string clientName)
+        #nullable disable
+        public static string ClientName { get; private set; }
+        public static int Port { get; private set; }
+        internal static Socket ClientSocket { get; private set; }
+        public static string SessionName { get; private set; }
+        public static string SessionIP { get; private set; }
+        #nullable enable
+
+        public static void Createclient(string sessionIP, int port, string clientName, string sessionName)
         {
-            this.Port = port;
-            this.ClientName = clientName;
-            this.ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Port = port;
+            ClientName = clientName;
+            SessionName = sessionName;
+            ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             LoopConnect();
             StartHandshake();
             SendLoop();
         }
 
-        private void LoopConnect()
+        private static void LoopConnect()
         {
             int attempts = 0;
             while(!ClientSocket.Connected)
@@ -39,7 +45,7 @@ namespace ConsoleCord
                     if (attempts > 10)
                     {
                         c.Clear();
-                        c.WriteLine($"Could not connect to host. {e.ToString()}");
+                        c.WriteLine($"Could not connect to host. {e}");
                         Environment.Exit(-1);
                     }
                 }
@@ -47,18 +53,39 @@ namespace ConsoleCord
             c.WriteLine("Connected to server.");
         }
 
-        private void StartHandshake()
+        private static void StartHandshake()
         {
+            byte[] buf = new byte[1024];
+            byte[] cmdBuf;
+            int rec = 0;
+
             // TODO: ADIS Handshake
+            c.WriteLine("Initiating handshake.");
 
             // TODO: send clhello
+            c.WriteLine("Sending CLHELLO...");
+            var helloArgs = new string[] { ClientName, "0.0.1", "0.0.1", "0.0.1"};
+            // name, arc version, ach version, akg version
+            ADISCommand clhello = new(ADISinstruction.clhello, helloArgs);
+            CCCCR.SendCommand(clhello);
+            c.WriteLine("Awaiting response.");
+
+            // get response
+            rec = ClientSocket.Receive(buf);
+            cmdBuf = new byte[rec];
+            Array.Copy(buf, cmdBuf, rec);
+            ADISCommand svHello = ADISCR.DeMarshalCommand(cmdBuf);
+            CCCCR.CheckSVHello(svHello);
+            c.WriteLine("SVHello is valid.");
+
+            // TODO: send PM key
         }
 
-        private void SendLoop()
+        private static void SendLoop()
         {
             c.WriteLine("attempting to send packet...");
             // as a test, send an echo request
-            Command echoReq = new(Ins.echo, new string[] { "hey", "there!" });
+            ADISCommand echoReq = new(ADISinstruction.echo, new string[] { "hey", "there!" });
             var packet = ADISCR.MarshalCommand(echoReq);
 
             ClientSocket.Send(packet);
@@ -75,5 +102,9 @@ namespace ConsoleCord
             //    // this is the send loop. this is also where most of the work is prob gonna be done client side
             //}
         }
+
+        
+
+        
     }
 }

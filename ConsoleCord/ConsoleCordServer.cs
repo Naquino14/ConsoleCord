@@ -8,22 +8,25 @@ using System.Text;
 
 namespace ConsoleCord
 {
-    internal class ConsolecordServer
+    internal class ConsoleCordServer
     {
-        private List<Socket> Clients = new();
-        private byte[] gBuffer = new byte[1024];
-        internal string ServerName { get; private set; }
-        internal int Port { get; private set; }
-        internal Socket ServerSocket { get; private set; }
-        internal ConsolecordServer(int port, string serverName)
+        internal static List<SvClient> Clients = new();
+        internal static byte[] gBuffer = new byte[1024];
+        #nullable disable
+        internal static string ServerName { get; private set; }
+        internal static int Port { get; private set; }
+        internal static Socket ServerSocket { get; private set; }
+        #nullable enable
+
+        internal static void CreateServer(int port, string serverName)
         {
-            this.Port = port;
-            this.ServerName = serverName;
-            this.ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Port = port;
+            ServerName = serverName;
+            ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             SetupServer();
         }
 
-        private void SetupServer()
+        private static void SetupServer()
         {
             c.WriteLine("Starting consolecord server...");
             ServerSocket.Bind(new IPEndPoint(IPAddress.Any, Port));
@@ -31,43 +34,42 @@ namespace ConsoleCord
             ServerSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
         }
 
-        private void AcceptCallback(IAsyncResult asyncResult)
+        private static void AcceptCallback(IAsyncResult asyncResult)
         {
             var socket = ServerSocket.EndAccept(asyncResult);
-            Clients.Add(socket);
+            SvClient client = new("", socket, Clients.Count);
+            Clients.Add(client);
             // TODO: request CLHELLO
             c.WriteLine("A client has connected...");
-            socket.BeginReceive(gBuffer, 0, gBuffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), socket);
+            socket.BeginReceive(gBuffer, 0, gBuffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), client);
             ServerSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
         }
 
-        private void RecieveCallback(IAsyncResult asyncResult) // TODO: manage handshaking
+        internal static void RecieveCallback(IAsyncResult asyncResult) // TODO: manage handshaking
         {
-            var socket = (Socket)asyncResult.AsyncState!;
+            // this is the main callback for recieving stuff
+            var client = (SvClient)asyncResult.AsyncState!;
+            var socket = client.ClientSocket;
             int recieved = socket.EndReceive(asyncResult);
             var buf = new byte[recieved];
             Array.Copy(gBuffer, buf, recieved);
-            //var payload = B2T(buf).Split(' ');
-            var command = ADISCR.DeMarshalCommand(buf);
-            c.WriteLine($"Payload recieved: {EH.B2S(buf)}. Parsed command: {command}");
-            // call the command registry to begin the handshake process.
-            c.WriteLine("Responding...");
-            // testing
-            if (command.instruction == Ins.echo)
+
+            if (!client.Secured) // use adiscr to marshal commands to secure
             {
-                string concatArgs = "";
-                if (command.args is not null && command.args.Length > 1)
-                    foreach (var s in command.args)
-                        concatArgs += $"{s} ";
-                byte[] packet = EH.S2B(command.args is not null ? concatArgs : "I cant echo nothing silly!");
-                socket.BeginSend(packet, 0, packet.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
+                ADISCommand command = ADISCR.DeMarshalCommand(buf);
+                c.WriteLine($"Payload Recieved: {command}");
+                CCSCR.RegisterCommand(command, client);
+            }
+            else
+            {
+
             }
 
-            socket.BeginReceive(gBuffer, 0, gBuffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), socket);
+            socket.BeginReceive(gBuffer, 0, gBuffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), client);
         }
 
 
-        private void SendCallback(IAsyncResult asyncResult)
+        internal static void SendCallback(IAsyncResult asyncResult)
         {
             var socket = (Socket)asyncResult.AsyncState!;
             socket.EndSend(asyncResult);
