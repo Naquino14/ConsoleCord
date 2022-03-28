@@ -12,3 +12,5 @@ ConsoleCord/ConsoleCord/obj
 ConsoleCord/.vs/ConsoleCord/v16/.suo
 ConsoleCord/.vs/ConsoleCord/v16/.suo
 ConsoleCord/obj
+*.v2
+*.v1
