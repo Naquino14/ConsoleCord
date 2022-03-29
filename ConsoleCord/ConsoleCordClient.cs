@@ -16,6 +16,8 @@ namespace ConsoleCord
         internal static Socket ClientSocket { get; private set; }
         public static string SessionName { get; private set; }
         public static string SessionIP { get; private set; }
+
+        internal static byte[] PublicKey { get; set; }
         #nullable enable
 
         public static void Createclient(string sessionIP, int port, string clientName, string sessionName)

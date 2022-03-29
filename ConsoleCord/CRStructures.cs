@@ -41,6 +41,9 @@ namespace ConsoleCord
         cutCom,
     }
 
+    /// <summary>
+    /// ConsoleCord Command
+    /// </summary>
     public class CCCommand
     {
         public CCInstruction instruction;

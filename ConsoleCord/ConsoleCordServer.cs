@@ -16,6 +16,7 @@ namespace ConsoleCord
         internal static string ServerName { get; private set; }
         internal static int Port { get; private set; }
         internal static Socket ServerSocket { get; private set; }
+        internal static byte[] PublicKey { get; set; }
         #nullable enable
 
         internal static void CreateServer(int port, string serverName)
