@@ -1,4 +1,4 @@
-﻿#define DEBUG_ARGS
+﻿//#define DEBUG_ARGS
 
 using System;
 using c = System.Console;

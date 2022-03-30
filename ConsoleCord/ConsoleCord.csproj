@@ -17,16 +17,16 @@
 
   <ItemGroup>
     <Reference Include="ACH-1 Demonstrator">
-      <HintPath>..\..\ADISTLS\ADIS-TLS\ADIS-TLS\bin\Debug\net6.0\ACH-1 Demonstrator.dll</HintPath>
+      <HintPath>..\..\ACH-1\ACH-1 Demonstrator\ACH-1 Demonstrator\bin\Debug\net6.0\ACH-1 Demonstrator.dll</HintPath>
     </Reference>
     <Reference Include="ADIS-TLS">
       <HintPath>..\..\ADISTLS\ADIS-TLS\ADIS-TLS\bin\Debug\net6.0\ADIS-TLS.dll</HintPath>
     </Reference>
     <Reference Include="AKG-1">
-      <HintPath>..\..\ADISTLS\ADIS-TLS\ADIS-TLS\bin\Debug\net6.0\AKG-1.dll</HintPath>
+      <HintPath>..\..\AKG-1\AKG-1\AKG-1\bin\Debug\net6.0\AKG-1.dll</HintPath>
     </Reference>
     <Reference Include="ARC-128">
-      <HintPath>..\..\ADISTLS\ADIS-TLS\ADIS-TLS\bin\Debug\net6.0\ARC-128.dll</HintPath>
+      <HintPath>..\..\ARC-128\ARC-128\bin\Debug\net6.0\ARC-128.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -57,9 +57,22 @@ namespace ConsoleCord
 
             if (!client.Secured) // use adiscr to marshal commands to secure
             {
-                ADISCommand command = ADISCR.DeMarshalCommand(buf);
-                c.WriteLine($"Payload Recieved: {command}");
-                CCSCR.RegisterCommand(command, client);
+                switch (client.incomingType)
+                {
+                    case ExpectedRawType.key:
+                        client.incomingType = ExpectedRawType.command;
+                        HandshakeHelper.HandshakeSvEchoTrust(buf, client);
+                        break;
+                    case ExpectedRawType.trust:
+                        client.incomingType = ExpectedRawType.command;
+                        CCSCR.HandleEchoTrust(client, buf);
+                        break;
+                    case ExpectedRawType.command:
+                        ADISCommand command = ADISCR.DeMarshalCommand(buf);
+                        c.WriteLine($"Payload Recieved: {command}");
+                        CCSCR.RegisterCommand(command, client);
+                        break;
+                }
             }
             else
             {
@@ -72,8 +85,8 @@ namespace ConsoleCord
 
         internal static void SendCallback(IAsyncResult asyncResult)
         {
-            var socket = (Socket)asyncResult.AsyncState!;
-            socket.EndSend(asyncResult);
+            var client = (SvClient)asyncResult.AsyncState!;
+            client.ClientSocket.EndSend(asyncResult);
         }
     }
 }
