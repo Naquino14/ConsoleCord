@@ -20,7 +20,6 @@ namespace ConsoleCord
             switch (command.instruction)
             {
                 case ADISinstruction.nul:
-                    ;
                     break;
                 case ADISinstruction.echo:
                     Echo(command, client);

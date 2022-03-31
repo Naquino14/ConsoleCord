@@ -75,13 +75,10 @@ namespace ConsoleCord
                 }
             }
             else
-            {
-
-            }
+                ; // TODO
 
             socket.BeginReceive(gBuffer, 0, gBuffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), client);
         }
-
 
         internal static void SendCallback(IAsyncResult asyncResult)
         {

@@ -162,7 +162,6 @@ namespace ConsoleCord
             CCCCR.SendPacket(packet);
 
             c.WriteLine($"Waiting for trust response...");
-
         }
 
         private static void SendLoop()
@@ -179,16 +178,7 @@ namespace ConsoleCord
             int rec = ClientSocket.Receive(buf);
             var payload = new byte[rec];
             Array.Copy(buf, payload, rec);
-            c.WriteLine($"Recieved payload: {EH.B2S(payload)}");
-
-            //for (;;)
-            //{
-            //    // this is the send loop. this is also where most of the work is prob gonna be done client side
-            //}
+            c.WriteLine($"Recieved payload: {EH.B2S(payload)}"); // send loop goes here? v
         }
-
-        
-
-        
     }
 }
