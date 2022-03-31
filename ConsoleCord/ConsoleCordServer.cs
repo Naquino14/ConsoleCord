@@ -73,9 +73,7 @@ namespace ConsoleCord
                         CCSCR.RegisterCommand(command, client);
                         break;
                 }
-            }
-            else
-                ; // TODO
+            } // TODO: else
 
             socket.BeginReceive(gBuffer, 0, gBuffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), client);
         }
