@@ -18,7 +18,6 @@ namespace ConsoleCord
             switch (command.instruction)
             {
                 case ADISinstruction.nul:
-                    ;
                     break;
                 case ADISinstruction.clhello:
                     
@@ -31,7 +30,6 @@ namespace ConsoleCord
             switch (command.instruction)
             {
                 case CCInstruction.nul:
-                    ;
                     break;
             }
         }

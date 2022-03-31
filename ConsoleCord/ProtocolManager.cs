@@ -48,7 +48,6 @@ namespace ConsoleCord
                 else
                 { c.WriteLine("Protocol has already been registered. Press any key to continue."); c.ReadLine(); return; }
                 key.Close();
-
             }
             else
             { c.WriteLine("This operation is only valid on Windows devices. Press any key co continue."); c.ReadLine(); return; }

@@ -1,5 +1,4 @@
-﻿
-namespace ConsoleCord
+﻿namespace ConsoleCord
 {
     public enum RegistryType
     {
@@ -72,8 +71,5 @@ namespace ConsoleCord
             }
             return toString;
         }
-
-
     }
-
 }

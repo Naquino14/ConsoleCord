@@ -85,7 +85,6 @@ namespace ConsoleCord
                 var packet = ADISCR.MarshalCommand(cutCom);
                 SendPacket(packet, client);
             }
-
         }
 
         private static void Echo(ADISCommand command, SvClient client)
