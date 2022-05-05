@@ -28,11 +28,15 @@ namespace ConsoleCord
                     HandleClHello(command, client);
                     break;
                 case ADISinstruction.reqKey:
-                    client.incomingType = ExpectedRawType.trust;
+                    client.incomingType = ExpectedRawType.command;
                     SendKey(client);
                     break;
                 case ADISinstruction.reqIV:
                     SendPacket(client.CurrentIV, client);
+                    string iv = "";
+                    foreach (var b in client.CurrentIV)
+                        iv += $"{b:X}";
+                    c.WriteLine($"IV ({iv}) sent to client {client.ClientName}#{client.ClientNumber} with a payload size of {client.CurrentIV.Length}");
                     break;
             }
         }

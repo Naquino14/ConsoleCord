@@ -65,13 +65,12 @@ namespace ADIS
             ADISCommand echotrust = new(ADISinstruction.echoTrust, args);
             var packet = ADISCR.MarshalCommand(echotrust);
             c.WriteLine($"echoTrust formed: {echotrust}.");
+            c.WriteLine($"Raw echotrust stream:\n{EH.B2S(packet)}");
 
             c.WriteLine("Encrypting echoTrust...");
-            c.WriteLine($"Before: {EH.B2S(packet)}");
             // encryption
             packet = EncryptPacket(packet, client.sharedPrivateKey, client);
-            c.WriteLine($"After: {EH.B2S(packet)}");
-            c.WriteLine("Sending encrypted echoTrust and awaiting response...");
+            c.WriteLine($"Sending encrypted echoTrust and awaiting response... (Packet size is {packet.Length} bytes)");
             client.EchoTrustArgs = args;
             CCSCR.SendPacket(packet, client);
         }

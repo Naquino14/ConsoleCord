@@ -115,53 +115,71 @@ namespace ConsoleCord
             c.WriteLine("Squishing key into 16 bytes...");
             HandshakeHelper.SquishKey(PrivateKey);
 
-            // echotrust
-            c.WriteLine("Listening for echoTrust...");
+            // get echoTrust
+            c.WriteLine("Listening for echoTrust from the server.");
             rec = ClientSocket.Receive(buf);
             var echoTrustPayload = new byte[rec];
             Array.Copy(buf, echoTrustPayload, rec);
-            
+            c.WriteLine($"echoTrust recieved (it is {echoTrustPayload.Length} bytes.):\n{EH.B2S(echoTrustPayload)}");
+
             // iv request
-            c.WriteLine("Requesting IV from the server.");
-            ADISCommand reqIV = new(ADISinstruction.reqIV);
-            CCCCR.SendCommand(reqIV);
-            c.WriteLine("Listening for IV...");
+            c.WriteLine("Requesting IV from server.");
+            CCCCR.SendCommand(new(ADISinstruction.reqIV));
             rec = ClientSocket.Receive(buf);
-            CurrentIV = new byte[16];
+            CurrentIV = new byte[rec];
             Array.Copy(buf, CurrentIV, rec);
             c.WriteLine("IV from server recieved: ");
             foreach (var b in CurrentIV)
                 c.Write($"{b:X}");
-
-            // decrypting echoTrust
-            c.WriteLine("\nDecrypting echoTrust...");
-            c.WriteLine($"Before: {EH.B2S(echoTrustPayload)}");
-            Thread.Sleep(1000);
-            ARC128 arc = new();
-            cmdBuf = arc.Decrypt(echoTrustPayload, PrivateKey, CurrentIV); // for some reason this isnt decrypting properly...
-            c.WriteLine($"After: {EH.B2S(cmdBuf)}");
-            foreach (var b in cmdBuf)
-                c.Write($"{b:X}");
             c.WriteLine();
-            c.WriteLine("Attempting to parse echoTrust.");
 
-            ADISCommand echoTrust = ADISCR.DeMarshalCommand(cmdBuf);
-            c.WriteLine($"echoTrust parsed: {echoTrust}.\nChecking echoTrust...");
-            if (echoTrust.args is null || echoTrust.args.Length != 4) // refuse the connection
-                CCCCR.RefuseConnection("Could not establsih a secure connection between the server and the client.");
-            else
-                c.WriteLine("echoTrust ok. Responding to server...");
-            // echo the trust ig?
-            // otp args (0^2)^(1^3)
+            // decrypt echoTrust
+            c.WriteLine("Decrypting echoTrust...");
+            ARC128 arc = new();
+            var decryptedEchoTrustStream = arc.Decrypt(echoTrustPayload, PrivateKey, CurrentIV);
+            c.WriteLine($"Decryption complete:\n{EH.B2S(decryptedEchoTrustStream)}");
 
-            byte[] trust = HandshakeHelper.OTPArray(
-                HandshakeHelper.OTPArray(EH.S2B(echoTrust.args![0]), EH.S2B(echoTrust.args![2])),
-                HandshakeHelper.OTPArray(EH.S2B(echoTrust.args![1]), EH.S2B(echoTrust.args![3])));
+            //// iv request
+            //c.WriteLine("Requesting IV from the server.");
+            //ADISCommand reqIV = new(ADISinstruction.reqIV);
+            //CCCCR.SendCommand(reqIV);
+            //c.WriteLine("Listening for IV...");
+            //rec = ClientSocket.Receive(buf);
+            //CurrentIV = new byte[16];
+            //Array.Copy(buf, CurrentIV, rec);
+            //c.WriteLine("IV from server recieved: ");
+            //foreach (var b in CurrentIV)
+            //    c.Write($"{b:X}");
 
-            var packet = arc.Encrypt(trust, PrivateKey, CurrentIV);
-            CCCCR.SendPacket(packet);
+            // check echotrust
 
-            c.WriteLine($"Waiting for trust response...");
+            //c.WriteLine($"Before: {EH.B2S(echoTrustPayload)}");
+            //Thread.Sleep(1000);
+            //ARC128 arc = new();
+            //cmdBuf = arc.Decrypt(echoTrustPayload, PrivateKey, CurrentIV); // for some reason this isnt decrypting properly...
+            //c.WriteLine($"After: {EH.B2S(cmdBuf)}");
+            //foreach (var b in cmdBuf)
+            //    c.Write($"{b:X}");
+            //c.WriteLine();
+            //c.WriteLine("Attempting to parse echoTrust.");
+
+            //ADISCommand echoTrust = ADISCR.DeMarshalCommand(cmdBuf);
+            //c.WriteLine($"echoTrust parsed: {echoTrust}.\nChecking echoTrust...");
+            //if (echoTrust.args is null || echoTrust.args.Length != 4) // refuse the connection
+            //    CCCCR.RefuseConnection("Could not establsih a secure connection between the server and the client.");
+            //else
+            //    c.WriteLine("echoTrust ok. Responding to server...");
+            //// echo the trust ig?
+            //// otp args (0^2)^(1^3)
+
+            //byte[] trust = HandshakeHelper.OTPArray(
+            //    HandshakeHelper.OTPArray(EH.S2B(echoTrust.args![0]), EH.S2B(echoTrust.args![2])),
+            //    HandshakeHelper.OTPArray(EH.S2B(echoTrust.args![1]), EH.S2B(echoTrust.args![3])));
+
+            //var packet = arc.Encrypt(trust, PrivateKey, CurrentIV);
+            //CCCCR.SendPacket(packet);
+
+            //c.WriteLine($"Waiting for trust response...");
         }
 
         private static void SendLoop()
