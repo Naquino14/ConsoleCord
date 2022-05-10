@@ -5,7 +5,7 @@ namespace ConsoleCord
     /// <summary>
     /// Encoding Helper
     /// </summary>
-    public class EH
+    public class EncodingHelper
     {
         /// <summary>
         /// Byte array to string.
@@ -19,5 +19,6 @@ namespace ConsoleCord
         /// <param name="a"></param>
         /// <returns></returns>
         public static byte[] S2B(string a) => Encoding.ASCII.GetBytes(a);
+
     }
 }

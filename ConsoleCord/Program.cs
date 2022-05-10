@@ -19,13 +19,16 @@ namespace ConsoleCord
             // ok so basically
             // if ur running an argument, dont remove anything
             // if it looks like cctp://command, get rid of anything befo command and that one nasty extraneous \ that exists for some reason...
-            // or if it looks like cctp:command, same thing
+            // or if it looks like cctp:command, same thing 
 
             /// Argument structure for servers:
             /// cctp://server ip
             /// port is optional
             switch (subArguments[0])
             {
+                case "testIpGet":
+                    c.WriteLine(GetPublicIPv4Address());
+                    break;
                 case "--setupProtocol":
                     ProtocolManager.Elevate(ProtocolManager.InstallType.install);
                     break;
@@ -40,13 +43,16 @@ namespace ConsoleCord
                     break;
                 case "server":
                     c.Title = "Server";
-                    ConsoleCordServer.CreateServer(int.Parse(subArguments[1]), subArguments[2]);
+                    string ip = subArguments[1];
+                    if (subArguments[1] == "infer")
+                        ;// todo: grab ip
+                    ConsoleCordServer.CreateServer(ip, int.Parse(subArguments[2]), subArguments[3]);
                     c.WriteLine("Press any key to stop the server.");
                     c.ReadLine();
                     break;
                 case "client": // client name must be at least 4 characters
                     c.Title = "Client";
-                    ConsoleCordClient.Createclient(subArguments[1], int.Parse(subArguments[2]), subArguments[3].Length >= 4 
+                    ConsoleCordClient.CreateClient(subArguments[1], int.Parse(subArguments[2]), subArguments[3].Length >= 4 
                         ? subArguments[3] 
                         : Environment.MachineName.Length >= 4 
                             ? Environment.MachineName 
@@ -71,6 +77,7 @@ namespace ConsoleCord
                 //    c.ReadLine();
                 //    return;
             }
+
             #if DEBUG_ARGS
             foreach (var s in subArguments)
                 c.WriteLine(s);
@@ -78,5 +85,7 @@ namespace ConsoleCord
             c.WriteLine("\nPress any key to coninue.");
             c.ReadKey();
         }
+
+        public static string GetPublicIPv4Address() => new HttpClient().GetStringAsync("https://ipinfo.io/ip").GetAwaiter().GetResult();
     }
 }
